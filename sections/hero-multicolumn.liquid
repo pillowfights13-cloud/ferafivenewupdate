@@ -1,0 +1,407 @@
+<section class="fera-hero-multi fera-hero-blocks-{{ section.blocks.size }}">
+    <div class="fera-hero-grid" 
+         data-desktop-cols="{{ section.settings.perRow }}" 
+         data-mobile-cols="{{ section.settings.perRowMob }}"
+         data-uniform="{{ section.settings.uniformMedia }}">
+        
+        {%- for block in section.blocks -%}
+        {%- liquid
+            assign hasUrl = false
+            case block.type
+                when 'image'
+                    assign mediaType = 'image'
+                    assign url = block.settings.url
+                    if url != blank
+                        assign hasUrl = true
+                    endif
+                when 'video'
+                    assign mediaType = 'video'
+                    assign url = block.settings.url
+                    if url != blank
+                        assign hasUrl = true
+                    endif
+            endcase
+        -%}
+        
+        <div class="fera-hero-cell" 
+             data-media-type="{{ mediaType }}" 
+             data-has-url="{{ hasUrl }}"
+             {{ block.shopify_attributes }}>
+            
+            {% if hasUrl %}<a href="{{ url }}" class="fera-hero-link">{% endif %}
+
+            {%- if block.settings.title != blank -%}
+            <div class="fera-hero-overlay" data-position="{{ block.settings.contentPosition }}">
+                <div class="fera-hero-content">
+                    <h3 class="fera-hero-title{% if block.settings.heroHasBg %} has-bg{% endif %}" 
+                        style="--title-bg:{{ block.settings.heroBg }};--title-color:{{ block.settings.heroColor }};">
+                        {{ block.settings.title }}
+                    </h3>
+                </div>
+            </div>
+            {%- endif -%}
+
+            {%- case block.type -%}
+            {%- when 'image' -%}
+                <div class="fera-hero-media">
+                    {%- assign imgMobile = block.settings.imageMobile -%}
+                    {%- assign imgDesktop = block.settings.image -%}
+
+                    {%- if imgDesktop != blank or imgMobile != blank -%}
+                        <picture>
+                            {%- if imgMobile != blank -%}
+                            <source 
+                                srcset="{{ imgMobile | image_url: width: 800 }} 800w,
+                                        {{ imgMobile | image_url: width: 1200 }} 1200w" 
+                                media="(max-width: 768px)">
+                            {%- endif -%}
+                            
+                            {%- if imgDesktop != blank -%}
+                            <img 
+                                src="{{ imgDesktop | image_url: width: 1500 }}"
+                                srcset="{{ imgDesktop | image_url: width: 800 }} 800w,
+                                        {{ imgDesktop | image_url: width: 1200 }} 1200w,
+                                        {{ imgDesktop | image_url: width: 1500 }} 1500w,
+                                        {{ imgDesktop | image_url: width: 2000 }} 2000w"
+                                alt="{{ block.settings.title | default: 'Féra Five' }}"
+                                loading="lazy"
+                                width="{{ imgDesktop.width }}"
+                                height="{{ imgDesktop.height }}">
+                            {%- else -%}
+                            <img 
+                                src="{{ imgMobile | image_url: width: 1500 }}"
+                                alt="{{ block.settings.title | default: 'Féra Five' }}"
+                                loading="lazy">
+                            {%- endif -%}
+                        </picture>
+                    {%- else -%}
+                        {{ 'collection-2' | placeholder_svg_tag: 'fera-placeholder' }}
+                    {%- endif -%}
+                </div>
+
+            {%- when 'video' -%}
+                <div class="fera-hero-media fera-video-wrapper"
+                     data-autoplay="{{ block.settings.videoAutoplay }}"
+                     data-loop="{{ block.settings.videoLoop }}"
+                     data-muted="{{ block.settings.videoMute }}"
+                     data-click-play="{{ block.settings.clickToPlay }}"
+                     data-controls="{{ block.settings.playPause }}">
+                    
+                    {%- assign vid = block.settings.video -%}
+                    {%- assign vidMobile = block.settings.videoMobile -%}
+
+                    {%- if vid != blank or vidMobile != blank -%}
+                        {%- if vidMobile != blank -%}
+                        <video class="fera-video fera-video-mobile"
+                               {% if block.settings.videoLoop %}loop{% endif %}
+                               {% if block.settings.videoMute %}muted{% endif %}
+                               {% if block.settings.videoAutoplay %}autoplay{% endif %}
+                               playsinline
+                               {% if block.settings.playPause and hasUrl == false %}controls{% endif %}>
+                            {%- for source in vidMobile.sources -%}
+                            <source src="{{ source.url }}" type="{{ source.mime_type }}">
+                            {%- endfor -%}
+                        </video>
+                        {%- endif -%}
+
+                        {%- if vid != blank -%}
+                        <video class="fera-video fera-video-desktop"
+                               {% if block.settings.videoLoop %}loop{% endif %}
+                               {% if block.settings.videoMute %}muted{% endif %}
+                               {% if block.settings.videoAutoplay %}autoplay{% endif %}
+                               playsinline
+                               {% if block.settings.playPause and hasUrl == false %}controls{% endif %}>
+                            {%- for source in vid.sources -%}
+                            <source src="{{ source.url }}" type="{{ source.mime_type }}">
+                            {%- endfor -%}
+                        </video>
+                        {%- endif -%}
+
+                        {%- if block.settings.playPause and hasUrl == false -%}
+                        <button class="fera-video-toggle" aria-label="Play/Pause">
+                            <svg class="play-icon" viewBox="0 0 24 24" width="48" height="48">
+                                <path d="M8 5v14l11-7z" fill="currentColor"/>
+                            </svg>
+                            <svg class="pause-icon" viewBox="0 0 24 24" width="48" height="48">
+                                <path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z" fill="currentColor"/>
+                            </svg>
+                        </button>
+                        {%- endif -%}
+                    {%- else -%}
+                        {{ 'collection-2' | placeholder_svg_tag: 'fera-placeholder' }}
+                    {%- endif -%}
+                </div>
+            {%- endcase -%}
+
+            {% if hasUrl %}</a>{% endif %}
+        </div>
+        {%- endfor -%}
+    </div>
+</section>
+
+<script>
+// Video control functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const videoWrappers = document.querySelectorAll('.fera-video-wrapper');
+    
+    videoWrappers.forEach(wrapper => {
+        const video = wrapper.querySelector('.fera-video');
+        const toggle = wrapper.querySelector('.fera-video-toggle');
+        const clickToPlay = wrapper.dataset.clickPlay === 'true';
+        const hasControls = wrapper.dataset.controls === 'true';
+        
+        if (!video) return;
+        
+        // Click to play/pause
+        if (clickToPlay && !wrapper.closest('[data-has-url="true"]')) {
+            video.addEventListener('click', () => {
+                if (video.paused) {
+                    video.play();
+                } else {
+                    video.pause();
+                }
+            });
+        }
+        
+        // Toggle button
+        if (toggle && hasControls) {
+            toggle.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                if (video.paused) {
+                    video.play();
+                } else {
+                    video.pause();
+                }
+            });
+            
+            video.addEventListener('play', () => {
+                toggle.classList.add('playing');
+            });
+            
+            video.addEventListener('pause', () => {
+                toggle.classList.remove('playing');
+            });
+        }
+    });
+});
+</script>
+
+{% schema %}
+{
+  "name": "Hero Multicolumn",
+  "class": "section-hero-multi",
+  "disabled_on": {
+    "groups": ["header", "footer", "aside"]
+  },
+  "max_blocks": 6,
+  "settings": [
+    {
+      "type": "select",
+      "id": "perRow",
+      "label": "Banners per row - desktop",
+      "default": "2",
+      "options": [
+        { "value": "2", "label": "Two" },
+        { "value": "3", "label": "Three" }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "perRowMob",
+      "label": "Banners per row - mobile",
+      "default": "1",
+      "options": [
+        { "value": "1", "label": "One" },
+        { "value": "2", "label": "Two" }
+      ]
+    },
+    {
+      "type": "checkbox",
+      "id": "uniformMedia",
+      "label": "Enable uniform media",
+      "info": "Keep all media elements the same size for a consistent appearance.",
+      "default": true
+    }
+  ],
+  "blocks": [
+    {
+      "name": "Image",
+      "type": "image",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Desktop Image",
+          "info": "9:16 aspect ratio recommended"
+        },
+        {
+          "type": "image_picker",
+          "id": "imageMobile",
+          "label": "Mobile Image",
+          "info": "9:16 aspect ratio recommended"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Heading"
+        },
+        {
+          "type": "url",
+          "id": "url",
+          "label": "Heading link"
+        },
+        {
+          "type": "select",
+          "id": "contentPosition",
+          "label": "Content position",
+          "default": "top left",
+          "options": [
+            { "value": "top left", "label": "Top left" },
+            { "value": "top center", "label": "Top center" },
+            { "value": "top right", "label": "Top right" },
+            { "value": "center left", "label": "Middle left" },
+            { "value": "center", "label": "Middle center" },
+            { "value": "center right", "label": "Middle right" },
+            { "value": "bottom left", "label": "Bottom left" },
+            { "value": "bottom center", "label": "Bottom center" },
+            { "value": "bottom right", "label": "Bottom right" }
+          ]
+        },
+        {
+          "type": "header",
+          "content": "Appearance"
+        },
+        {
+          "type": "color",
+          "id": "heroColor",
+          "label": "Heading text color",
+          "default": "#000000"
+        },
+        {
+          "type": "color",
+          "id": "heroBg",
+          "label": "Heading background color",
+          "default": "#FFFFFF"
+        },
+        {
+          "type": "checkbox",
+          "id": "heroHasBg",
+          "label": "Enable heading background",
+          "default": false
+        }
+      ]
+    },
+    {
+      "name": "Video",
+      "type": "video",
+      "settings": [
+        {
+          "type": "video",
+          "id": "video",
+          "label": "Desktop Video",
+          "info": "9:16 aspect ratio recommended"
+        },
+        {
+          "type": "video",
+          "id": "videoMobile",
+          "label": "Mobile Video",
+          "info": "9:16 aspect ratio recommended"
+        },
+        {
+          "type": "checkbox",
+          "id": "videoLoop",
+          "label": "Loop",
+          "default": false
+        },
+        {
+          "type": "checkbox",
+          "id": "videoMute",
+          "label": "Mute",
+          "default": true
+        },
+        {
+          "type": "checkbox",
+          "id": "videoAutoplay",
+          "label": "Autoplay",
+          "default": false,
+          "info": "Not supported on mobile devices and disabled by default in many browsers."
+        },
+        {
+          "type": "checkbox",
+          "id": "clickToPlay",
+          "label": "Enable click to play",
+          "info": "Click video to toggle play/pause. Won't work if Heading link is defined.",
+          "default": true
+        },
+        {
+          "type": "checkbox",
+          "id": "playPause",
+          "label": "Enable play/pause button",
+          "default": false,
+          "info": "Won't work if Heading link is defined."
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Heading",
+          "default": "Your hero video heading"
+        },
+        {
+          "type": "url",
+          "id": "url",
+          "label": "Heading link"
+        },
+        {
+          "type": "select",
+          "id": "contentPosition",
+          "label": "Content position",
+          "default": "top left",
+          "options": [
+            { "value": "top left", "label": "Top left" },
+            { "value": "top center", "label": "Top center" },
+            { "value": "top right", "label": "Top right" },
+            { "value": "center left", "label": "Middle left" },
+            { "value": "center", "label": "Middle center" },
+            { "value": "center right", "label": "Middle right" },
+            { "value": "bottom left", "label": "Bottom left" },
+            { "value": "bottom center", "label": "Bottom center" },
+            { "value": "bottom right", "label": "Bottom right" }
+          ]
+        },
+        {
+          "type": "header",
+          "content": "Appearance"
+        },
+        {
+          "type": "color",
+          "id": "heroColor",
+          "label": "Heading text color",
+          "default": "#000000"
+        },
+        {
+          "type": "color",
+          "id": "heroBg",
+          "label": "Heading background color",
+          "default": "#FFFFFF"
+        },
+        {
+          "type": "checkbox",
+          "id": "heroHasBg",
+          "label": "Enable heading background",
+          "default": false
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Hero Multicolumn",
+      "blocks": [
+        { "type": "image" },
+        { "type": "video" }
+      ]
+    }
+  ]
+}
+{% endschema %}

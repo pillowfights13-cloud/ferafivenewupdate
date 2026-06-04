@@ -1,0 +1,700 @@
+{%- assign current_variant = product.selected_or_first_available_variant -%}
+
+<style>
+  .hc-popup-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.65);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease;
+    backdrop-filter: blur(3px);
+    -webkit-backdrop-filter: blur(3px);
+  }
+
+  .hc-popup-overlay.hc-popup--visible {
+    opacity: 1;
+    pointer-events: all;
+  }
+
+  .hc-popup {
+    background: #fff;
+    border-radius: 20px;
+    overflow: hidden;
+    width: 100%;
+    max-width: 420px;
+    position: relative;
+    transform: translateY(20px);
+    transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+    max-height: 90vh;
+    overflow-y: auto;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .hc-popup::-webkit-scrollbar { display: none; }
+
+  .hc-popup-overlay.hc-popup--visible .hc-popup {
+    transform: translateY(0);
+  }
+
+  .hc-popup__close {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.12);
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+    -webkit-tap-highlight-color: transparent;
+    transition: background 0.2s;
+  }
+
+  .hc-popup__close:hover { background: rgba(255,255,255,0.22); }
+
+  .hc-popup__close svg {
+    width: 13px;
+    height: 13px;
+    stroke: #fff;
+    stroke-width: 2;
+    fill: none;
+    stroke-linecap: round;
+  }
+
+  /* ── HERO ── */
+  .hc-popup__hero {
+    background: #0f0f0f;
+    padding: 32px 24px 28px;
+    text-align: center;
+    position: relative;
+  }
+
+  .hc-popup__sale-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(172,29,33,0.15);
+    border: 1px solid rgba(172,29,33,0.35);
+    color: #ff6b6b;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    padding: 5px 12px;
+    border-radius: 20px;
+    margin-bottom: 18px;
+  }
+
+  .hc-popup__sale-dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: #4ce279;
+    animation: hcDotPulse 1.4s ease-in-out infinite;
+  }
+
+  @keyframes hcDotPulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.3; transform: scale(0.6); }
+  }
+
+  .hc-popup__headline {
+    font-size: 34px;
+    font-weight: 800;
+    color: #fff;
+    line-height: 1.08;
+    letter-spacing: -0.03em;
+    margin-bottom: 8px;
+  }
+
+  .hc-popup__headline em {
+    font-style: italic;
+    font-weight: 300;
+    color: #AC1D21;
+  }
+
+  .hc-popup__hero-sub {
+    font-size: 13px;
+    color: rgba(255,255,255,0.45);
+    line-height: 1.6;
+    margin-bottom: 24px;
+    max-width: 280px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .hc-popup__timer-label {
+    font-size: 9px;
+    font-weight: 700;
+    color: rgba(255,255,255,0.3);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  .hc-popup__timer {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 12px;
+    padding: 10px 14px;
+  }
+
+  .hc-popup__tblock {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 40px;
+  }
+
+  .hc-popup__tnum {
+    font-size: 20px;
+    font-weight: 800;
+    color: #fff;
+    line-height: 1;
+    letter-spacing: -0.02em;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .hc-popup__tunit {
+    font-size: 8px;
+    font-weight: 600;
+    color: rgba(255,255,255,0.3);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-top: 3px;
+  }
+
+  .hc-popup__tsep {
+    font-size: 16px;
+    font-weight: 700;
+    color: rgba(255,255,255,0.2);
+    padding-bottom: 8px;
+    align-self: center;
+  }
+
+  /* ── BODY ── */
+  .hc-popup__body {
+    padding: 20px 22px 24px;
+    background: #fff;
+  }
+
+  .hc-popup__product-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 14px;
+    background: #f8f8f6;
+    border-radius: 12px;
+    margin-bottom: 14px;
+    border: 1px solid #ebebeb;
+  }
+
+  .hc-popup__product-img {
+    width: 56px;
+    height: 56px;
+    border-radius: 8px;
+    object-fit: cover;
+    flex-shrink: 0;
+    background: #e8e8e4;
+  }
+
+  .hc-popup__product-details {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .hc-popup__product-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: #0f0f0f;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-bottom: 3px;
+  }
+
+  .hc-popup__product-pricing {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+
+  .hc-popup__price {
+    font-size: 15px;
+    font-weight: 800;
+    color: #0f0f0f;
+  }
+
+  .hc-popup__compare {
+    font-size: 12px;
+    color: #ccc;
+    text-decoration: line-through;
+  }
+
+  .hc-popup__discount-pill {
+    background: #4ce279;
+    color: #000;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    padding: 2px 7px;
+    border-radius: 4px;
+  }
+
+  .hc-popup__offer-strip {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    background: #fff5f5;
+    border: 1.5px solid rgba(172,29,33,0.2);
+    border-radius: 10px;
+    padding: 12px 14px;
+    margin-bottom: 16px;
+  }
+
+  .hc-popup__offer-strip-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    background: rgba(172,29,33,0.08);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .hc-popup__offer-strip-icon svg {
+    width: 16px;
+    height: 16px;
+    stroke: #AC1D21;
+    stroke-width: 1.5;
+    fill: none;
+  }
+
+  .hc-popup__offer-strip-text h4 {
+    font-size: 13px;
+    font-weight: 700;
+    color: #AC1D21;
+    margin-bottom: 2px;
+  }
+
+  .hc-popup__offer-strip-text p {
+    font-size: 11px;
+    color: #999;
+    line-height: 1.5;
+    margin: 0;
+  }
+
+  {%- if product.variants.size > 1 -%}
+  .hc-popup__variants {
+    margin-bottom: 14px;
+  }
+
+  .hc-popup__variants-label {
+    font-size: 10px;
+    font-weight: 700;
+    color: #bbb;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 7px;
+  }
+
+  .hc-popup__variant-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .hc-popup__vbtn {
+    border: 1.5px solid #e8e8e4;
+    border-radius: 7px;
+    background: #fff;
+    padding: 6px 14px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #555;
+    cursor: pointer;
+    font-family: inherit;
+    -webkit-tap-highlight-color: transparent;
+    transition: border-color 0.15s, background 0.15s, color 0.15s;
+  }
+
+  .hc-popup__vbtn:hover {
+    border-color: #333;
+    color: #111;
+  }
+
+  .hc-popup__vbtn.active {
+    border-color: #0f0f0f;
+    background: #0f0f0f;
+    color: #fff;
+  }
+
+  .hc-popup__vbtn[disabled] {
+    opacity: 0.3;
+    cursor: not-allowed;
+  }
+  {%- endif -%}
+
+  .hc-popup__atc {
+    width: 100%;
+    background: #AC1D21;
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    padding: 14px 16px;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    letter-spacing: 0.01em;
+    transition: opacity 0.15s;
+    font-family: inherit;
+    -webkit-tap-highlight-color: transparent;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .hc-popup__atc svg {
+    width: 16px;
+    height: 16px;
+    stroke: #fff;
+    stroke-width: 2;
+    fill: none;
+    flex-shrink: 0;
+  }
+
+  .hc-popup__atc:hover { opacity: 0.88; }
+  .hc-popup__atc:active { opacity: 0.75; }
+  .hc-popup__atc:disabled {
+    background: #e0e0e0;
+    color: #aaa;
+    cursor: not-allowed;
+    opacity: 1;
+  }
+
+  .hc-popup__dismiss {
+    width: 100%;
+    background: none;
+    border: none;
+    font-size: 12px;
+    color: #ccc;
+    cursor: pointer;
+    padding: 4px;
+    font-family: inherit;
+    text-align: center;
+    transition: color 0.15s;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .hc-popup__dismiss:hover { color: #999; }
+
+  /* ── TRUST BAR ── */
+  .hc-popup__trust {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    padding: 12px 22px;
+    border-top: 1px solid #f2f2f2;
+    background: #fafafa;
+    flex-wrap: wrap;
+  }
+
+  .hc-popup__trust-item {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 10px;
+    font-weight: 600;
+    color: #aaa;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .hc-popup__trust-item svg {
+    width: 11px;
+    height: 11px;
+    stroke: #AC1D21;
+    stroke-width: 1.5;
+    fill: none;
+    flex-shrink: 0;
+  }
+
+  /* ── MOBILE ── */
+  @media (max-width: 480px) {
+    .hc-popup-overlay {
+      padding: 16px;
+      align-items: center;
+    }
+
+    .hc-popup {
+      max-width: 100%;
+      border-radius: 20px;
+    }
+
+    .hc-popup__headline { font-size: 28px; }
+    .hc-popup__hero { padding: 28px 20px 24px; }
+    .hc-popup__body { padding: 16px 18px 20px; }
+    .hc-popup__trust { gap: 10px; padding: 10px 18px; }
+  }
+</style>
+
+<div class="hc-popup-overlay" id="hc-sale-popup" onclick="if(event.target===this)hcPopupClose();">
+  <div class="hc-popup" role="dialog" aria-modal="true" aria-label="Limited sale offer">
+
+    <button class="hc-popup__close" onclick="hcPopupClose();" aria-label="Close offer">
+      <svg viewBox="0 0 13 13"><path d="M1 1l11 11M12 1L1 12"/></svg>
+    </button>
+
+    <div class="hc-popup__hero">
+      <div class="hc-popup__sale-pill">
+        <span class="hc-popup__sale-dot"></span>
+        15-Day Sale — Live Now
+      </div>
+      <h2 class="hc-popup__headline">Buy 2,<br>Get 1 <em>Free</em></h2>
+      <p class="hc-popup__hero-sub">Exclusive offer ending soon. The cheapest item in your cart is on us.</p>
+      <div class="hc-popup__timer-label">Offer ends in</div>
+      <div class="hc-popup__timer">
+        <div class="hc-popup__tblock">
+          <span class="hc-popup__tnum" id="hc-popup-days">00</span>
+          <span class="hc-popup__tunit">Days</span>
+        </div>
+        <span class="hc-popup__tsep">:</span>
+        <div class="hc-popup__tblock">
+          <span class="hc-popup__tnum" id="hc-popup-hours">00</span>
+          <span class="hc-popup__tunit">Hrs</span>
+        </div>
+        <span class="hc-popup__tsep">:</span>
+        <div class="hc-popup__tblock">
+          <span class="hc-popup__tnum" id="hc-popup-mins">00</span>
+          <span class="hc-popup__tunit">Min</span>
+        </div>
+        <span class="hc-popup__tsep">:</span>
+        <div class="hc-popup__tblock">
+          <span class="hc-popup__tnum" id="hc-popup-secs">00</span>
+          <span class="hc-popup__tunit">Sec</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="hc-popup__body">
+
+      <div class="hc-popup__product-row">
+        {%- if product.featured_image -%}
+          <img
+            class="hc-popup__product-img"
+            src="{{ product.featured_image | image_url: width: 128 }}"
+            alt="{{ product.title | escape }}"
+            width="56"
+            height="56"
+            loading="lazy"
+          >
+        {%- endif -%}
+        <div class="hc-popup__product-details">
+          <div class="hc-popup__product-title">{{ product.title }}</div>
+          <div class="hc-popup__product-pricing">
+            <span class="hc-popup__price" id="hc-popup-price">{{ current_variant.price | money }}</span>
+            {%- if current_variant.compare_at_price > current_variant.price -%}
+              <span class="hc-popup__compare">{{ current_variant.compare_at_price | money }}</span>
+              {%- assign pct = current_variant.compare_at_price | minus: current_variant.price | times: 100 | divided_by: current_variant.compare_at_price -%}
+              <span class="hc-popup__discount-pill">{{ pct }}% OFF</span>
+            {%- endif -%}
+          </div>
+        </div>
+      </div>
+
+      <div class="hc-popup__offer-strip">
+        <div class="hc-popup__offer-strip-icon">
+          <svg viewBox="0 0 24 24"><path d="M20 12V22H4V12"/><path d="M22 7H2v5h20V7z"/><path d="M12 22V7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>
+        </div>
+        <div class="hc-popup__offer-strip-text">
+          <h4>Buy 2, Get 1 Absolutely Free</h4>
+          <p>Add 3 items — cheapest is free. Discount applied at checkout.</p>
+        </div>
+      </div>
+
+      {%- if product.variants.size > 1 -%}
+        <div class="hc-popup__variants">
+          <div class="hc-popup__variants-label">{{ product.options.first }}</div>
+          <div class="hc-popup__variant-list">
+            {%- for variant in product.variants -%}
+              <button
+                class="hc-popup__vbtn{% if variant == current_variant %} active{% endif %}"
+                data-id="{{ variant.id }}"
+                data-price="{{ variant.price }}"
+                onclick="hcPopupVariant(this)"
+                {% unless variant.available %}disabled{% endunless %}
+              >{{ variant.title }}</button>
+            {%- endfor -%}
+          </div>
+        </div>
+      {%- endif -%}
+
+      <button class="hc-popup__atc" id="hc-popup-atc" onclick="hcPopupAddToCart()">
+        <svg viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+        Grab the Offer
+      </button>
+      <button class="hc-popup__dismiss" onclick="hcPopupClose()">No thanks, I'll pay full price</button>
+
+    </div>
+
+    <div class="hc-popup__trust">
+      <div class="hc-popup__trust-item">
+        <svg viewBox="0 0 24 24"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg>
+        FDA Licensed
+      </div>
+      <div class="hc-popup__trust-item">
+        <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        GMP Certified
+      </div>
+      <div class="hc-popup__trust-item">
+        <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+        Cruelty-Free
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+(function() {
+  var SALE_END   = new Date('2026-05-15T23:59:59');
+  var VISIT_KEY  = 'hc_visit_count';
+  var DELAY_MS   = 8000;
+  var selectedId = {{ current_variant.id }};
+
+  function pad(n) { return n < 10 ? '0' + n : '' + n; }
+
+  function tick() {
+    var diff = SALE_END - new Date();
+    if (diff <= 0) {
+      ['days','hours','mins','secs'].forEach(function(k){
+        var el = document.getElementById('hc-popup-' + k);
+        if (el) el.textContent = '00';
+      });
+      return;
+    }
+    var d = document.getElementById('hc-popup-days');
+    var h = document.getElementById('hc-popup-hours');
+    var m = document.getElementById('hc-popup-mins');
+    var s = document.getElementById('hc-popup-secs');
+    if (d) d.textContent = pad(Math.floor(diff / 86400000));
+    if (h) h.textContent = pad(Math.floor((diff % 86400000) / 3600000));
+    if (m) m.textContent = pad(Math.floor((diff % 3600000) / 60000));
+    if (s) s.textContent = pad(Math.floor((diff % 60000) / 1000));
+  }
+
+  function showPopup() {
+    var overlay = document.getElementById('hc-sale-popup');
+    if (!overlay) return;
+    overlay.classList.add('hc-popup--visible');
+    document.body.style.overflow = 'hidden';
+    tick();
+    setInterval(tick, 1000);
+  }
+
+  function getVisitCount() {
+    try { return parseInt(localStorage.getItem(VISIT_KEY) || '0'); } catch(e) { return 0; }
+  }
+
+  function incrementVisitCount() {
+    try {
+      var c = getVisitCount() + 1;
+      localStorage.setItem(VISIT_KEY, c);
+      return c;
+    } catch(e) { return 1; }
+  }
+
+  window.hcPopupClose = function() {
+    var overlay = document.getElementById('hc-sale-popup');
+    if (!overlay) return;
+    overlay.classList.remove('hc-popup--visible');
+    document.body.style.overflow = '';
+  };
+
+  window.hcPopupVariant = function(btn) {
+    document.querySelectorAll('.hc-popup__vbtn').forEach(function(b){ b.classList.remove('active'); });
+    btn.classList.add('active');
+    selectedId = parseInt(btn.getAttribute('data-id'));
+    var price = parseInt(btn.getAttribute('data-price'));
+    var el = document.getElementById('hc-popup-price');
+    if (el) el.textContent = 'Rs.\u00a0' + (price/100).toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2});
+  };
+
+  window.hcPopupAddToCart = function() {
+    var btn = document.getElementById('hc-popup-atc');
+    btn.disabled = true;
+    btn.innerHTML = 'Adding...';
+
+    var sectionsToBundle = [];
+    document.documentElement.dispatchEvent(new CustomEvent('cart:prepare-bundled-sections',{
+      bubbles: true, detail: { sections: sectionsToBundle }
+    }));
+
+    fetch((window.Shopify ? window.Shopify.routes.root : '/') + 'cart/add.js', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+      body: JSON.stringify({
+        items: [{ id: selectedId, quantity: 1 }],
+        sections: sectionsToBundle.join(','),
+        sections_url: window.location.pathname
+      })
+    })
+    .then(function(r){ return r.json(); })
+    .then(function(res){
+      return fetch((window.Shopify ? window.Shopify.routes.root : '/') + 'cart.js')
+        .then(function(r){ return r.json(); })
+        .then(function(cart){
+          cart['sections'] = res['sections'];
+          var items = res.hasOwnProperty('items') ? res['items'] : [res];
+          var vp   = document.querySelector('variant-picker[form-id]');
+          var form = vp ? document.forms[vp.getAttribute('form-id')] : null;
+          if (form) {
+            form.dispatchEvent(new CustomEvent('variant:add',{
+              bubbles: true,
+              detail: { items: items, cart: cart, onSuccessDo: null }
+            }));
+          }
+          document.documentElement.dispatchEvent(new CustomEvent('cart:change',{
+            bubbles: true,
+            detail: { baseEvent: 'variant:add', cart: cart, onSuccessDo: null }
+          }));
+          hcPopupClose();
+          btn.disabled = false;
+          btn.innerHTML = '<svg viewBox="0 0 24 24" width="16" height="16" stroke="#fff" stroke-width="2" fill="none"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>Grab the Offer';
+        });
+    })
+    .catch(function(){
+      btn.disabled = false;
+      btn.innerHTML = '<svg viewBox="0 0 24 24" width="16" height="16" stroke="#fff" stroke-width="2" fill="none"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>Grab the Offer';
+    });
+  };
+
+  var visitCount = incrementVisitCount();
+  var isOddVisit = visitCount % 2 !== 0;
+
+  if (isOddVisit) {
+    setTimeout(showPopup, DELAY_MS);
+  }
+
+})();
+</script>

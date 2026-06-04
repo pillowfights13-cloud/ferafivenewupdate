@@ -1,0 +1,154 @@
+{%- comment -%}
+  HC Price + Quantity Selector
+  Usage: {%- render 'hc-price-qty', product: product, product_form_id: product_form_id -%}
+{%- endcomment -%}
+
+<style>
+  .hc-pq-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin: 12px 0;
+  }
+
+  .hc-pq-price__compare {
+    font-size: 16px;
+    font-weight: 500;
+    color: #999;
+    text-decoration: line-through;
+    margin-left: 8px;
+  }
+
+  .hc-pq-price__current {
+    font-size: 28px;
+    font-weight: 800;
+    color: #000;
+    line-height: 1;
+  }
+
+  .hc-pq-price__main {
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+  }
+
+  .hc-pq-price__mrp {
+    font-size: 12px;
+    font-weight: 400;
+    color: #999;
+    margin: 4px 0 0;
+  }
+
+  .hc-pq-qty__label {
+    font-size: 13px;
+    font-weight: 700;
+    color: #000;
+    margin: 0 0 6px;
+    text-align: center;
+  }
+
+  .hc-pq-qty .quantity-selector {
+    border: 2px solid #000;
+    border-radius: 8px;
+    overflow: hidden;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    background: none;
+  }
+
+  .hc-pq-qty .quantity-selector__button {
+    background: none;
+    border: none;
+    width: 44px;
+    height: 44px;
+    color: #000;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    padding: 0;
+    -webkit-tap-highlight-color: transparent;
+    text-decoration: none;
+  }
+
+  .hc-pq-qty .quantity-selector__button:active {
+    opacity: 0.5;
+  }
+
+  .hc-pq-qty .quantity-selector__button[disabled] {
+    opacity: 0.3;
+    cursor: not-allowed;
+    pointer-events: none;
+  }
+
+  .hc-pq-qty .quantity-selector__input {
+    width: 40px;
+    border: none;
+    outline: none;
+    background: none;
+    font-size: 16px;
+    font-weight: 700;
+    color: #000;
+    text-align: center;
+    -moz-appearance: textfield;
+    padding: 0;
+    height: 44px;
+  }
+
+  .hc-pq-qty .quantity-selector__input::-webkit-outer-spin-button,
+  .hc-pq-qty .quantity-selector__input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+  }
+
+  @media (max-width: 749px) {
+    .hc-pq-price__current {
+      font-size: 22px;
+    }
+
+    .hc-pq-price__compare {
+      font-size: 14px;
+    }
+
+    .hc-pq-qty .quantity-selector {
+      height: 40px;
+    }
+
+    .hc-pq-qty .quantity-selector__button {
+      width: 40px;
+      height: 40px;
+    }
+
+    .hc-pq-qty .quantity-selector__input {
+      height: 40px;
+    }
+  }
+</style>
+
+<div class="hc-pq-row">
+
+  <div class="hc-pq-price">
+    <div class="hc-pq-price__main">
+      <span class="hc-pq-price__current">
+        {{ product.selected_or_first_available_variant.price | money }}
+      </span>
+      {%- if product.selected_or_first_available_variant.compare_at_price > product.selected_or_first_available_variant.price -%}
+        <span class="hc-pq-price__compare">
+          {{ product.selected_or_first_available_variant.compare_at_price | money }}
+        </span>
+      {%- endif -%}
+    </div>
+    <p class="hc-pq-price__mrp">MRP incl. of all taxes</p>
+  </div>
+
+  <div class="hc-pq-qty">
+    <p class="hc-pq-qty__label">Quantity</p>
+    {%- render 'quantity-selector',
+      variant: product.selected_or_first_available_variant,
+      form: product_form_id
+    -%}
+  </div>
+
+</div>

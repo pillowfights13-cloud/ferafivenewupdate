@@ -1,0 +1,411 @@
+{%- if section.settings.show_sticky_add_to_cart and product.available -%}
+
+  <style>
+    product-sticky-bar.hc-sticky-bar {
+      position: fixed !important;
+      z-index: 200 !important;
+      background: #fff !important;
+      box-sizing: border-box !important;
+      overflow: visible !important;
+      flex-direction: column !important;
+      gap: 10px !important;
+      border-radius: 8px !important;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.13) !important;
+      opacity: 0 !important;
+      pointer-events: none !important;
+      transition: opacity 0.2s ease !important;
+    }
+
+    product-sticky-bar.hc-sticky-bar.hc-scroll--visible {
+      opacity: 1 !important;
+      pointer-events: all !important;
+    }
+
+    .hc-sticky-bar__compare {
+      font-size: 12px;
+      font-weight: 400;
+      color: #aaa;
+      text-decoration: line-through;
+      line-height: 1;
+    }
+
+    .hc-sticky-bar__price-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .hc-sticky-bar__price {
+      font-size: 20px;
+      font-weight: 800;
+      color: #000;
+      line-height: 1;
+    }
+
+    .hc-sticky-bar__badge {
+      background: #4ce279;
+      color: #000;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 7px;
+      border-radius: 5px;
+      white-space: nowrap;
+      line-height: 1.4;
+    }
+
+    .hc-sticky-bar__variant {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      width: 50%;
+    }
+
+    .hc-sticky-bar__swatch {
+      width: 12px;
+      height: 12px;
+      border-radius: 3px;
+      flex-shrink: 0;
+      border: 1px solid rgba(0,0,0,0.12);
+    }
+
+    .hc-sticky-bar__variant select {
+      width: 100%;
+      border: 1px solid #e8e8e8;
+      border-radius: 0;
+      font-size: 11px;
+      font-weight: 500;
+      color: #333;
+      padding: 5px 20px 5px 8px;
+      background: #f5f5f5 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='7' height='4' viewBox='0 0 7 4'%3E%3Cpath d='M1 1l2.5 2L6 1' stroke='%23888' stroke-width='1' fill='none' stroke-linecap='round'/%3E%3C/svg%3E") no-repeat right 7px center;
+      -webkit-appearance: none;
+      appearance: none;
+      cursor: pointer;
+    }
+
+    .hc-sticky-bar__variant select:focus {
+      outline: none;
+      border-color: #AC1D21;
+    }
+
+    .hc-sticky-bar__actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    product-sticky-bar.hc-sticky-bar .button {
+      flex: 1;
+      background: #AC1D21 !important;
+      color: #fff !important;
+      border-color: #AC1D21 !important;
+      border-radius: 8px !important;
+      padding: 12px 16px !important;
+      font-size: 14px !important;
+      font-weight: 700 !important;
+      white-space: nowrap;
+      letter-spacing: 0.02em;
+    }
+
+    product-sticky-bar.hc-sticky-bar .button:hover { opacity: 0.88; }
+
+    product-sticky-bar.hc-sticky-bar .button[disabled] {
+      background: #e0e0e0 !important;
+      color: #999 !important;
+      border-color: #e0e0e0 !important;
+      cursor: not-allowed;
+    }
+
+    @media (max-width: 749px) {
+      product-sticky-bar.hc-sticky-bar {
+        bottom: 0 !important;
+        left: 50% !important;
+        right: auto !important;
+        top: auto !important;
+        transform: translateX(-50%) !important;
+        width: calc(100% - 32px) !important;
+        border-radius: 8px 8px 0 0 !important;
+        padding: 12px 14px !important;
+        padding-bottom: max(12px, env(safe-area-inset-bottom)) !important;
+      }
+    }
+
+    @media (min-width: 750px) {
+      product-sticky-bar.hc-sticky-bar {
+        bottom: 20px !important;
+        right: 20px !important;
+        left: auto !important;
+        top: auto !important;
+        transform: none !important;
+        width: 40% !important;
+        max-width: 480px !important;
+        min-width: 300px !important;
+        border-radius: 8px !important;
+        padding: 14px 16px !important;
+      }
+    }
+  </style>
+
+  <product-rerender id="{{ product_form_id }}-sticky-bar" observe-form="{{ product_form_id }}">
+    <product-sticky-bar form="{{ product_form_id }}" class="hc-sticky-bar" id="hc-bar-{{ section.id }}">
+
+      {%- assign current_variant = product.selected_or_first_available_variant -%}
+
+      {%- if product.variants.size > 1 -%}
+        <div class="hc-sticky-bar__variant">
+          {%- for option in product.options_with_values -%}
+            {%- assign option_downcase = option.name | downcase -%}
+            {%- if option_downcase == 'color' or option_downcase == 'colour' -%}
+              <span
+                class="hc-sticky-bar__swatch"
+                style="background: {{ option.selected_value | downcase | replace: ' ', '' }};"
+              ></span>
+            {%- endif -%}
+          {%- endfor -%}
+
+          <select
+            id="hc-sticky-select-{{ section.id }}"
+            onchange="hcStickySelectChange('{{ section.id }}', this)"
+          >
+            {%- for variant in product.variants -%}
+              <option
+                value="{{ variant.id }}"
+                {% if variant == current_variant %}selected{% endif %}
+                {% unless variant.available %}disabled{% endunless %}
+              >{{ variant.title }}</option>
+            {%- endfor -%}
+          </select>
+        </div>
+      {%- endif -%}
+
+      <div class="hc-sticky-bar__actions">
+        <div>
+          {%- if current_variant.compare_at_price > current_variant.price -%}
+            <div class="hc-sticky-bar__compare" id="hc-sticky-compare-{{ section.id }}">{{ current_variant.compare_at_price | money }}</div>
+          {%- else -%}
+            <div class="hc-sticky-bar__compare" id="hc-sticky-compare-{{ section.id }}" style="display:none;"></div>
+          {%- endif -%}
+          <div class="hc-sticky-bar__price-row">
+            <span class="hc-sticky-bar__price" id="hc-sticky-price-{{ section.id }}">{{ current_variant.price | money }}</span>
+            {%- if current_variant.compare_at_price > current_variant.price -%}
+              {%- assign savings_pct = current_variant.compare_at_price | minus: current_variant.price | times: 100 | divided_by: current_variant.compare_at_price -%}
+              <span class="hc-sticky-bar__badge" id="hc-sticky-badge-{{ section.id }}">{{ savings_pct }}% OFF</span>
+            {%- else -%}
+              <span class="hc-sticky-bar__badge" id="hc-sticky-badge-{{ section.id }}" style="display:none;"></span>
+            {%- endif -%}
+          </div>
+        </div>
+
+        <buy-buttons class="buy-buttons" style="flex:1;display:flex;" template="{{ product.template_suffix | escape }}" form="{{ product_form_id }}">
+          {%- liquid
+            assign button_disabled = false
+            assign button_style = 'solid'
+            if current_variant == nil
+              assign button_disabled = true
+              assign button_style = 'outline'
+              assign button_content = 'product.general.unavailable_button' | t
+            elsif current_variant.available == false
+              assign button_disabled = true
+              assign button_style = 'outline'
+              assign button_content = 'product.general.sold_out_button' | t
+            else
+              if product.template_suffix contains 'pre-order'
+                assign button_content = 'product.general.pre_order_button' | t
+              else
+                assign button_content = 'product.general.add_to_cart_button' | t
+              endif
+            endif
+          -%}
+          {%- render 'button',
+            content: button_content,
+            style: button_style,
+            type: 'submit',
+            form: product_form_id,
+            disabled: button_disabled
+          -%}
+        </buy-buttons>
+      </div>
+
+    </product-sticky-bar>
+  </product-rerender>
+
+<script>
+(function hcStickyInit() {
+  var sid    = '{{ section.id }}';
+  var bar    = document.getElementById('hc-bar-' + sid);
+
+  var ALL_VARIANTS = [
+    {%- for variant in product.variants -%}
+      {id:{{ variant.id }},price:{{ variant.price }},compare_at_price:{{ variant.compare_at_price | default: 0 }},available:{{ variant.available }},title:{{ variant.title | json }}}{% unless forloop.last %},{% endunless %}
+    {%- endfor -%}
+  ];
+
+  if (!bar) return;
+
+  /* ── SCROLL ── */
+  function onScroll() {
+    var y = window.scrollY || window.pageYOffset;
+    var h = document.body.scrollHeight;
+    bar.classList.toggle('hc-scroll--visible', y >= h * 0.10 && y <= h * 0.80);
+  }
+  window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+
+  /* ── FORMAT ── */
+  function fmt(cents) {
+    return 'Rs.\u00a0' + (cents / 100).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  }
+
+  /* ── FIND VARIANT ── */
+  function findById(id) {
+    for (var i = 0; i < ALL_VARIANTS.length; i++) {
+      if (ALL_VARIANTS[i].id === id) return ALL_VARIANTS[i];
+    }
+    return null;
+  }
+
+  function findCheapestAvailable() {
+    var found = null;
+    for (var i = 0; i < ALL_VARIANTS.length; i++) {
+      if (ALL_VARIANTS[i].available) { found = ALL_VARIANTS[i]; break; }
+    }
+    return found || ALL_VARIANTS[0];
+  }
+
+  /* ── UPDATE UI ── */
+  function updateBarUI(variant) {
+    if (!variant) return;
+    var priceEl   = document.getElementById('hc-sticky-price-' + sid);
+    var compareEl = document.getElementById('hc-sticky-compare-' + sid);
+    var badgeEl   = document.getElementById('hc-sticky-badge-' + sid);
+    var selectEl  = document.getElementById('hc-sticky-select-' + sid);
+
+    if (priceEl) priceEl.textContent = fmt(variant.price);
+
+    if (variant.compare_at_price && variant.compare_at_price > variant.price) {
+      var pct = Math.round((variant.compare_at_price - variant.price) * 100 / variant.compare_at_price);
+      if (compareEl) { compareEl.textContent = fmt(variant.compare_at_price); compareEl.style.display = ''; }
+      if (badgeEl)   { badgeEl.textContent = pct + '% OFF'; badgeEl.style.display = ''; }
+    } else {
+      if (compareEl) compareEl.style.display = 'none';
+      if (badgeEl)   badgeEl.style.display   = 'none';
+    }
+
+    if (selectEl) {
+      for (var i = 0; i < selectEl.options.length; i++) {
+        selectEl.options[i].selected = parseInt(selectEl.options[i].value) === variant.id;
+      }
+    }
+  }
+
+  /* ── READ VARIANT FROM URL ── */
+  function getVariantFromUrl() {
+    var match = window.location.search.match(/[?&]variant=(\d+)/);
+    return match ? parseInt(match[1]) : null;
+  }
+
+  /* ── READ VARIANT FROM PAGE TITLE ATTR ── */
+  function getVariantFromPage() {
+    /* Try URL first */
+    var urlId = getVariantFromUrl();
+    if (urlId) return findById(urlId);
+
+    /* Try selected input in any form */
+    var inputs = document.querySelectorAll('input[name="id"]');
+    for (var i = 0; i < inputs.length; i++) {
+      var val = parseInt(inputs[i].value);
+      var v = findById(val);
+      if (v) return v;
+    }
+
+    /* Try selected variant picker radio */
+    var vp = document.querySelector('variant-picker');
+    if (vp) {
+      var checked = vp.querySelectorAll('input[type="radio"]:checked');
+      if (checked.length > 0) {
+        var options = [];
+        checked.forEach(function(c) { options.push(c.value); });
+        var title = options.join(' / ');
+        for (var j = 0; j < ALL_VARIANTS.length; j++) {
+          if (ALL_VARIANTS[j].title === title) return ALL_VARIANTS[j];
+        }
+      }
+    }
+
+    return findCheapestAvailable();
+  }
+
+  /* ── POLL URL + INPUTS ── */
+  var lastId = null;
+
+  function poll() {
+    var v = getVariantFromPage();
+    if (v && v.id !== lastId) {
+      lastId = v.id;
+      updateBarUI(v);
+    }
+  }
+
+  setInterval(poll, 250);
+  poll();
+
+  /* ── ALSO LISTEN TO POPSTATE (URL CHANGES) ── */
+  window.addEventListener('popstate', poll);
+
+  /* ── INTERCEPT HISTORY PUSHSTATE ── */
+  var origPushState = history.pushState.bind(history);
+  history.pushState = function() {
+    origPushState.apply(history, arguments);
+    setTimeout(poll, 50);
+  };
+
+  var origReplaceState = history.replaceState.bind(history);
+  history.replaceState = function() {
+    origReplaceState.apply(history, arguments);
+    setTimeout(poll, 50);
+  };
+
+  /* ── STICKY SELECT → MAIN VARIANT PICKER ── */
+  window.hcStickySelectChange = function(sectionId, sel) {
+    if (sectionId !== sid) return;
+    var variantId = parseInt(sel.value);
+    var variant   = findById(variantId);
+
+    /* Update URL */
+    var url = new URL(window.location.href);
+    url.searchParams.set('variant', variantId);
+    history.replaceState({}, '', url.toString());
+
+    /* Try to click the matching radio in variant-picker */
+    var vp = document.querySelector('variant-picker');
+    if (vp && variant) {
+      var parts = variant.title.split(' / ');
+      parts.forEach(function(val, idx) {
+        var input = vp.querySelector('input[data-option-position="' + (idx + 1) + '"][value="' + CSS.escape(val) + '"]');
+        if (!input) {
+          /* fallback: find by value */
+          var all = vp.querySelectorAll('input[data-option-position="' + (idx + 1) + '"]');
+          for (var i = 0; i < all.length; i++) {
+            if (all[i].value === val) { input = all[i]; break; }
+          }
+        }
+        if (input && !input.checked) {
+          input.checked = true;
+          input.dispatchEvent(new Event('change', { bubbles: true }));
+        }
+      });
+    }
+
+    /* Also update hidden input directly */
+    var hiddenInputs = document.querySelectorAll('input[name="id"]');
+    hiddenInputs.forEach(function(h) {
+      h.value = variantId;
+      h.dispatchEvent(new Event('change', { bubbles: true }));
+    });
+
+    updateBarUI(variant);
+  };
+
+})();
+</script>
+
+{%- endif -%}

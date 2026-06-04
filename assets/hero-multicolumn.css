@@ -1,0 +1,302 @@
+/* ============================================
+   FÉRA FIVE — HERO MULTICOLUMN SECTION
+   Standalone | No Dependencies
+   ============================================ */
+
+.fera-hero-multi {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+/* Grid Container */
+.fera-hero-grid {
+    display: grid;
+    gap: 1px;
+    background: rgba(0, 0, 0, 0.1);
+}
+
+/* Desktop: 2 columns */
+.fera-hero-grid[data-desktop-cols="2"] {
+    grid-template-columns: repeat(2, 1fr);
+}
+
+/* Desktop: 3 columns */
+.fera-hero-grid[data-desktop-cols="3"] {
+    grid-template-columns: repeat(3, 1fr);
+}
+
+/* Mobile Layouts */
+@media (max-width: 768px) {
+    .fera-hero-grid[data-mobile-cols="1"] {
+        grid-template-columns: 1fr;
+    }
+    
+    .fera-hero-grid[data-mobile-cols="2"] {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* Grid Cell */
+.fera-hero-cell {
+    position: relative;
+    background: #fff;
+    overflow: hidden;
+}
+
+/* Link Reset */
+.fera-hero-link {
+    display: block;
+    text-decoration: none;
+    color: inherit;
+}
+
+/* Media Container */
+.fera-hero-media {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+/* Uniform Media Sizing */
+.fera-hero-grid[data-uniform="true"] .fera-hero-media {
+    aspect-ratio: 9 / 16;
+}
+
+.fera-hero-grid[data-uniform="true"] .fera-hero-media img,
+.fera-hero-grid[data-uniform="true"] .fera-hero-media video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Non-uniform: Natural sizing */
+.fera-hero-grid[data-uniform="false"] .fera-hero-media img,
+.fera-hero-grid[data-uniform="false"] .fera-hero-media video {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+/* Picture Element */
+.fera-hero-media picture {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+.fera-hero-media img {
+    display: block;
+}
+
+/* Placeholder SVG */
+.fera-placeholder {
+    width: 100%;
+    min-height: 400px;
+    fill: rgba(0, 0, 0, 0.1);
+}
+
+/* Overlay for Title */
+.fera-hero-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 10;
+    display: flex;
+    pointer-events: none;
+}
+
+/* Disable pointer events for video overlays unless link exists */
+.fera-hero-cell[data-media-type="video"][data-has-url="false"] .fera-hero-overlay {
+    pointer-events: none;
+}
+
+.fera-hero-cell[data-media-type="video"][data-has-url="true"] .fera-hero-overlay {
+    pointer-events: all;
+}
+
+/* Content Positioning */
+.fera-hero-overlay[data-position="top left"] {
+    justify-content: flex-start;
+    align-items: flex-start;
+}
+
+.fera-hero-overlay[data-position="top center"] {
+    justify-content: center;
+    align-items: flex-start;
+}
+
+.fera-hero-overlay[data-position="top right"] {
+    justify-content: flex-end;
+    align-items: flex-start;
+}
+
+.fera-hero-overlay[data-position="center left"] {
+    justify-content: flex-start;
+    align-items: center;
+}
+
+.fera-hero-overlay[data-position="center"] {
+    justify-content: center;
+    align-items: center;
+}
+
+.fera-hero-overlay[data-position="center right"] {
+    justify-content: flex-end;
+    align-items: center;
+}
+
+.fera-hero-overlay[data-position="bottom left"] {
+    justify-content: flex-start;
+    align-items: flex-end;
+}
+
+.fera-hero-overlay[data-position="bottom center"] {
+    justify-content: center;
+    align-items: flex-end;
+}
+
+.fera-hero-overlay[data-position="bottom right"] {
+    justify-content: flex-end;
+    align-items: flex-end;
+}
+
+/* Title Styling */
+.fera-hero-title {
+    margin: clamp(1rem, 3vw, 2rem);
+    font-size: clamp(1.5rem, 3vw, 2.5rem);
+    font-weight: 400;
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+    color: var(--title-color, #000);
+    max-width: calc(100% - 4rem);
+    pointer-events: all;
+}
+
+/* Title with Background */
+.fera-hero-title.has-bg {
+    display: inline-block;
+    padding: 0.75rem 1.25rem;
+    background: var(--title-bg, #fff);
+    border-radius: 2px;
+}
+
+/* Mobile Title Adjustments */
+@media (max-width: 768px) {
+    .fera-hero-title {
+        margin: clamp(0.75rem, 4vw, 1.5rem);
+        font-size: clamp(1.25rem, 4vw, 2rem);
+    }
+}
+
+/* ============================================
+   VIDEO CONTROLS
+   ============================================ */
+
+.fera-video-wrapper {
+    position: relative;
+}
+
+.fera-video {
+    display: block;
+    width: 100%;
+}
+
+/* Hide mobile video on desktop */
+.fera-video-mobile {
+    display: none;
+}
+
+@media (max-width: 768px) {
+    .fera-video-desktop {
+        display: none;
+    }
+    
+    .fera-video-mobile {
+        display: block;
+    }
+}
+
+/* If only desktop video exists */
+.fera-video-wrapper:not(:has(.fera-video-mobile)) .fera-video-desktop {
+    display: block;
+}
+
+/* Play/Pause Toggle Button */
+.fera-video-toggle {
+    position: absolute;
+    bottom: 1.5rem;
+    right: 1.5rem;
+    z-index: 20;
+    width: 48px;
+    height: 48px;
+    border: none;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.9);
+    color: #000;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    pointer-events: all;
+}
+
+.fera-video-toggle:hover {
+    background: rgba(255, 255, 255, 1);
+    transform: scale(1.05);
+}
+
+.fera-video-toggle .pause-icon {
+    display: none;
+}
+
+.fera-video-toggle.playing .play-icon {
+    display: none;
+}
+
+.fera-video-toggle.playing .pause-icon {
+    display: block;
+}
+
+/* Hide toggle if controls are native */
+.fera-video-wrapper[data-controls="false"] .fera-video-toggle {
+    display: none;
+}
+
+/* Cursor indication for clickable video */
+.fera-video-wrapper[data-click-play="true"]:not([data-has-url="true"]) .fera-video {
+    cursor: pointer;
+}
+
+/* ============================================
+   RESPONSIVE REFINEMENTS
+   ============================================ */
+
+@media (max-width: 768px) {
+    .fera-video-toggle {
+        bottom: 1rem;
+        right: 1rem;
+        width: 40px;
+        height: 40px;
+    }
+    
+    .fera-video-toggle svg {
+        width: 32px;
+        height: 32px;
+    }
+}
+
+/* Smooth media loading */
+.fera-hero-media img,
+.fera-hero-media video {
+    transition: opacity 0.3s ease;
+}
+
+.fera-hero-media img[loading="lazy"] {
+    opacity: 1;
+}
+
+.fera-hero-media img[loading="lazy"].loaded {
+    opacity: 1;
+}

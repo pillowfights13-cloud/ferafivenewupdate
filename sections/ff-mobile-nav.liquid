@@ -1,0 +1,745 @@
+{% comment %}
+  ════════════════════════════════════════════════════════
+  FéraFive — Mobile Bottom Navigation Bar  v3.0
+  File : sections/ff-mobile-nav.liquid
+  Theme: Prestige (Invisible Themes)
+
+  Isolation strategy
+  ──────────────────
+  • Every single class is prefixed ff-
+  • All layout / positioning rules carry !important
+  • CSS is scoped under #ff-mobile-nav so zero bleed
+  • Body padding uses a CSS custom property pushed only
+    on mobile via a <style> tag — never touches desktop
+  • No bare tag selectors (no body {}, no footer {})
+  • Smile.io: href="#smile-home" (official anchor)
+  • Cart: triggers Prestige's native cart drawer
+
+  Tabs: Menu · Search · WhatsApp · Cart · Sale · Rewards
+  ════════════════════════════════════════════════════════
+{% endcomment %}
+
+{%- if section.settings.ff_enable -%}
+
+{%- assign ff_order = section.settings.ff_tab_order | split: ',' -%}
+
+<nav id="ff-mobile-nav" role="navigation" aria-label="Quick navigation">
+
+  {%- for ff_raw in ff_order -%}
+    {%- assign ff_k = ff_raw | strip -%}
+
+    {%- if ff_k == 'menu' and section.settings.ff_show_menu -%}
+      <button
+        class="ff-tab ff-tab--menu"
+        type="button"
+        aria-label="Open menu"
+        onclick="ffNavMenu()"
+      >
+        <span class="ff-tab__icon" aria-hidden="true">
+          <svg class="ff-svg" width="20" height="20" viewBox="0 0 20 20" fill="none">
+            <rect x="2"  y="2.5" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.2"/>
+            <rect x="11" y="2.5" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.2"/>
+            <rect x="2"  y="11" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.2"/>
+            <rect x="11" y="11" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.2"/>
+          </svg>
+        </span>
+        <span class="ff-tab__label">{{ section.settings.ff_lbl_menu | default: 'Menu' }}</span>
+        <span class="ff-tab__dot" aria-hidden="true"></span>
+      </button>
+
+    {%- elsif ff_k == 'search' and section.settings.ff_show_search -%}
+      <button
+        class="ff-tab ff-tab--search"
+        type="button"
+        aria-label="Search"
+        onclick="ffNavSearch()"
+      >
+        <span class="ff-tab__icon" aria-hidden="true">
+          <svg class="ff-svg" width="20" height="20" viewBox="0 0 20 20" fill="none">
+            <circle cx="8.5" cy="8.5" r="5.5" stroke="currentColor" stroke-width="1.2"/>
+            <path d="M13 13L17 17" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+          </svg>
+        </span>
+        <span class="ff-tab__label">{{ section.settings.ff_lbl_search | default: 'Search' }}</span>
+        <span class="ff-tab__dot" aria-hidden="true"></span>
+      </button>
+
+    {%- elsif ff_k == 'whatsapp' and section.settings.ff_show_whatsapp -%}
+      {%- assign ff_wanum = section.settings.ff_wa_number | remove: '+' | remove: ' ' | remove: '-' -%}
+      {%- assign ff_wamsg = section.settings.ff_wa_message | url_encode -%}
+      <a
+        class="ff-tab ff-tab--whatsapp"
+        href="https://wa.me/{{ ff_wanum }}{% if ff_wamsg != blank %}?text={{ ff_wamsg }}{% endif %}"
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label="Chat on WhatsApp"
+      >
+        <span class="ff-tab__icon ff-tab__icon--wa" aria-hidden="true">
+        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 28 28">
+                <g id="Group_334287" data-name="Group 334287" transform="translate(7687 572)">
+                  <rect id="Rectangle_114332" data-name="Rectangle 114332" width="28" height="28" transform="translate(-7687 -572)" fill="none"></rect>
+                  <g id="Group_334286" data-name="Group 334286" transform="translate(-1493.774 -411)">
+                    <path id="Digital_Inline_White" d="M11.581,0A11.49,11.49,0,0,0,1.629,17.225L0,23.176l6.088-1.6a11.474,11.474,0,0,0,5.488,1.4h0A11.489,11.489,0,0,0,11.581,0Zm0,21.038h0a9.528,9.528,0,0,1-4.858-1.331L6.37,19.5l-3.612.948.964-3.522-.227-.361a9.545,9.545,0,1,1,8.086,4.473Z" transform="translate(-6190.226 -159)" fill="#1a2024" stroke="#fff" stroke-width="0.5"></path>
+                    <path id="Digital_Inline_White-2" data-name="Digital_Inline_White" d="M17.547,14.507c-.3-.149-1.765-.871-2.039-.971s-.473-.149-.672.149-.771.971-.944,1.17-.348.224-.646.075a8.157,8.157,0,0,1-2.4-1.481,8.974,8.974,0,0,1-1.66-2.067c-.174-.3-.019-.46.131-.609.134-.133.3-.348.447-.523a2.017,2.017,0,0,0,.3-.5.55.55,0,0,0-.025-.523c-.075-.149-.672-1.618-.92-2.216-.242-.581-.488-.5-.672-.512s-.373-.01-.572-.01a1.1,1.1,0,0,0-.8.373A3.346,3.346,0,0,0,6.034,9.353,5.808,5.808,0,0,0,7.252,12.44a13.3,13.3,0,0,0,5.1,4.505,17.208,17.208,0,0,0,1.7.628,4.093,4.093,0,0,0,1.879.118,3.073,3.073,0,0,0,2.014-1.419,2.494,2.494,0,0,0,.174-1.419c-.075-.124-.274-.2-.572-.348Z" transform="translate(-6190.747 -159.527)" fill="#1a2024"></path>
+                  </g>
+                </g>
+              </svg>
+        </span>
+        <span class="ff-tab__label">{{ section.settings.ff_lbl_whatsapp | default: 'WhatsApp' }}</span>
+      </a>
+
+    {%- elsif ff_k == 'cart' and section.settings.ff_show_cart -%}
+      <button
+        class="ff-tab ff-tab--cart"
+        type="button"
+        aria-label="Open cart"
+        onclick="ffNavCart()"
+      >
+        <span class="ff-tab__icon" aria-hidden="true">
+          <span class="ff-cart-wrap">
+            <svg class="ff-svg" width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <path d="M3 3H4.5L6.5 13H14.5L16.5 6H5.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+              <circle cx="8"  cy="16.5" r="1"   fill="currentColor"/>
+              <circle cx="13" cy="16.5" r="1"   fill="currentColor"/>
+            </svg>
+            {%- if cart.item_count > 0 -%}
+            <span class="ff-cart-badge" id="ff-cart-count">{{ cart.item_count }}</span>
+            {%- else -%}
+            <span class="ff-cart-badge ff-cart-badge--empty" id="ff-cart-count">0</span>
+            {%- endif -%}
+          </span>
+        </span>
+        <span class="ff-tab__label">{{ section.settings.ff_lbl_cart | default: 'Cart' }}</span>
+        <span class="ff-tab__dot" aria-hidden="true"></span>
+      </button>
+
+    {%- elsif ff_k == 'sale' and section.settings.ff_show_sale -%}
+      <a
+        class="ff-tab ff-tab--sale"
+        href="{{ section.settings.ff_sale_url | default: '/collections/all' }}"
+        aria-label="{{ section.settings.ff_lbl_sale | default: 'Sale' }}"
+      >
+        <span class="ff-tab__icon" aria-hidden="true">
+          <svg class="ff-svg" width="20" height="20" viewBox="0 0 20 20" fill="none">
+            <circle cx="10" cy="10" r="7.5" stroke="currentColor" stroke-width="1.2"/>
+            <path d="M7 13L13 7" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+            <circle cx="7.5"  cy="7.5"  r="0.9" fill="currentColor"/>
+            <circle cx="12.5" cy="12.5" r="0.9" fill="currentColor"/>
+          </svg>
+        </span>
+        <span class="ff-tab__label">{{ section.settings.ff_lbl_sale | default: 'Sale' }}</span>
+        <span class="ff-tab__dot" aria-hidden="true"></span>
+      </a>
+
+    {%- elsif ff_k == 'rewards' and section.settings.ff_show_rewards -%}
+      <a
+        class="ff-tab ff-tab--rewards"
+        href="#smile-home"
+        aria-label="{{ section.settings.ff_lbl_rewards | default: 'Rewards' }}"
+      >
+        <span class="ff-tab__icon" aria-hidden="true">
+          <svg class="ff-svg" width="20" height="20" viewBox="0 0 20 20" fill="none">
+            <path d="M10 2L11.6 7.2H17L12.7 10.3L14.3 15.5L10 12.4L5.7 15.5L7.3 10.3L3 7.2H8.4L10 2Z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round" fill="none"/>
+          </svg>
+        </span>
+        <span class="ff-tab__label">{{ section.settings.ff_lbl_rewards | default: 'Rewards' }}</span>
+        <span class="ff-tab__dot" aria-hidden="true"></span>
+      </a>
+
+    {%- endif -%}
+  {%- endfor -%}
+
+</nav>
+
+{%- comment -%} ── Spacer: pushes page content above the bar on mobile only ── {%- endcomment -%}
+<div id="ff-nav-spacer"></div>
+
+{%- endif -%}
+
+<style>
+/* ════════════════════════════════════════════════════════
+   FéraFive Mobile Nav — fully namespaced under #ff-mobile-nav
+   Every layout rule uses !important to survive Prestige overrides
+   Zero bare tag selectors. Zero global side-effects.
+════════════════════════════════════════════════════════ */
+
+/* ── Hide on desktop — hard block ── */
+#ff-mobile-nav,
+#ff-nav-spacer {
+  display: none !important;
+}
+
+/* ── Mobile only ── */
+@media screen and (max-width: 767px) {
+
+  /* ── Spacer pushes content up — replaces any body padding hack ── */
+  #ff-nav-spacer {
+    display: block !important;
+    height: 68px !important;
+    height: calc(68px + env(safe-area-inset-bottom, 0px)) !important;
+    width: 100% !important;
+    flex-shrink: 0 !important;
+    /* Transparent — purely structural */
+    background: transparent !important;
+    pointer-events: none !important;
+  }
+
+  /* ── Bar shell ── */
+  #ff-mobile-nav {
+    display: flex !important;
+    align-items: flex-end !important;
+    justify-content: space-around !important;
+    /* Fixed to bottom — own stacking context */
+    position: fixed !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    z-index: 9990 !important;            /* above Prestige overlays */
+    width: 100% !important;
+    height: 68px !important;
+    height: calc(68px + env(safe-area-inset-bottom, 0px)) !important;
+    padding: 0 6px !important;
+    padding-bottom: calc(10px + env(safe-area-inset-bottom, 0px)) !important;
+    /* Warm off-white — FéraFive palette */
+    background-color: {{ section.settings.ff_bg_color }} !important;
+    border-top: 0.5px solid {{ section.settings.ff_border_color }} !important;
+    box-shadow: 0 -2px 24px rgba(0, 0, 0, 0.07) !important;
+    /* Hardware-accelerated blur on supported devices */
+    -webkit-backdrop-filter: blur(14px) !important;
+    backdrop-filter: blur(14px) !important;
+    /* Prevent Prestige from collapsing it */
+    box-sizing: border-box !important;
+    margin: 0 !important;
+    overflow: visible !important;        /* allow WhatsApp bubble to peek up */
+  }
+
+  /* ── Shared tab styles ── */
+  #ff-mobile-nav .ff-tab {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: flex-end !important;
+    gap: 4px !important;
+    flex: 1 !important;
+    min-width: 0 !important;
+    height: 100% !important;
+    padding: 0 2px 2px !important;
+    /* Colours */
+    color: {{ section.settings.ff_icon_color }} !important;
+    /* Reset everything Prestige might inherit */
+    background: transparent !important;
+    border: none !important;
+    border-radius: 0 !important;
+    outline: none !important;
+    text-decoration: none !important;
+    cursor: pointer !important;
+    font-family: inherit !important;
+    font-size: inherit !important;
+    line-height: 1 !important;
+    /* Disable Prestige tap highlight */
+    -webkit-tap-highlight-color: transparent !important;
+    /* Smooth press */
+    transition: color 180ms ease, transform 140ms ease !important;
+    -webkit-appearance: none !important;
+    appearance: none !important;
+    position: relative !important;
+    /* Prevent Prestige link styles */
+    text-transform: none !important;
+    letter-spacing: normal !important;
+    box-shadow: none !important;
+  }
+
+  #ff-mobile-nav .ff-tab:active {
+    transform: translateY(-2px) !important;
+    color: {{ section.settings.ff_icon_active_color }} !important;
+  }
+
+  #ff-mobile-nav .ff-tab.ff-tab--active {
+    color: {{ section.settings.ff_icon_active_color }} !important;
+  }
+
+  /* ── SVG icon ── */
+  #ff-mobile-nav .ff-tab__icon {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex-shrink: 0 !important;
+    width: 22px !important;
+    height: 22px !important;
+    /* No inherited transforms */
+    transform: none !important;
+    transition: none !important;
+  }
+
+  #ff-mobile-nav .ff-svg {
+    display: block !important;
+    width: 20px !important;
+    height: 20px !important;
+    flex-shrink: 0 !important;
+    fill: none !important;           /* ensure Prestige doesn't fill icons */
+  }
+
+  /* ── Label ── */
+  #ff-mobile-nav .ff-tab__label {
+    display: block !important;
+    font-size: 9px !important;
+    font-weight: 400 !important;
+    letter-spacing: 0.08em !important;
+    text-transform: uppercase !important;
+    line-height: 1 !important;
+    color: inherit !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    max-width: 54px !important;
+    pointer-events: none !important;
+    /* Kill any Prestige label styles */
+    background: none !important;
+    border: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    text-decoration: none !important;
+  }
+
+  /* ── Active indicator dot ── */
+  #ff-mobile-nav .ff-tab__dot {
+    display: block !important;
+    position: absolute !important;
+    top: 6px !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    width: 3px !important;
+    height: 3px !important;
+    border-radius: 50% !important;
+    background: {{ section.settings.ff_icon_active_color }} !important;
+    opacity: 0 !important;
+    transition: opacity 180ms ease !important;
+    pointer-events: none !important;
+  }
+
+  #ff-mobile-nav .ff-tab.ff-tab--active .ff-tab__dot {
+    opacity: 1 !important;
+  }
+
+  /* No dot on WhatsApp */
+  #ff-mobile-nav .ff-tab--whatsapp .ff-tab__dot {
+    display: none !important;
+  }
+
+  /* ────────────────────────────────────
+     WhatsApp — elevated bubble
+  ──────────────────────────────────── */
+ 
+
+  /* ────────────────────────────────────
+     Cart badge
+  ──────────────────────────────────── */
+  #ff-mobile-nav .ff-cart-wrap {
+    display: inline-flex !important;
+    position: relative !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+
+  #ff-mobile-nav .ff-cart-badge {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    position: absolute !important;
+    top: -6px !important;
+    right: -8px !important;
+    min-width: 16px !important;
+    height: 16px !important;
+    padding: 0 4px !important;
+    border-radius: 8px !important;
+    background: {{ section.settings.ff_icon_active_color }} !important;
+    color: {{ section.settings.ff_bg_color }} !important;
+    font-size: 9px !important;
+    font-weight: 600 !important;
+    line-height: 1 !important;
+    font-family: inherit !important;
+    letter-spacing: 0 !important;
+    text-transform: none !important;
+    pointer-events: none !important;
+    /* Override Prestige badge styles */
+    border: none !important;
+    box-shadow: none !important;
+    transform: none !important;
+  }
+
+  #ff-mobile-nav .ff-cart-badge--empty {
+    display: none !important;
+  }
+
+}
+
+button.smile-improved-mobile-launcher,
+button[aria-label="Open Smile.io Rewards Program"] {
+  display: none !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+  opacity: 0 !important;
+}
+
+
+
+
+</style>
+
+
+<script>
+if (window.innerWidth <= 767) {
+  var smileLauncher = document.getElementById('smile-ui-lite-launcher-frame-container');
+  if (smileLauncher) smileLauncher.style.display = 'none';
+}
+</script>
+
+<script>
+  if (window.innerWidth <= 767) {
+    var ffTargets = ['smile-ui-lite-launcher-frame-container', 'kiwi-big-iframe-wrapper'];
+
+    ffTargets.forEach(function(id) {
+      var el = document.getElementById(id);
+      if (el) {
+        el.style.display = 'none';
+      }
+    });
+
+    var ffObserver = new MutationObserver(function() {
+      ffTargets.forEach(function(id) {
+        var el = document.getElementById(id);
+        if (el) el.style.display = 'none';
+      });
+    });
+
+    ffObserver.observe(document.body, { childList: true, subtree: true });
+  }
+</script>
+
+
+
+<script>
+/* ════════════════════════════════════════════════════════
+   FéraFive Nav JS — namespaced with ffNav prefix
+   Safe: no globals overwritten, IIFE wrapped
+════════════════════════════════════════════════════════ */
+(function() {
+  'use strict';
+
+  /* ── Prestige-specific selectors (menu drawer) ──
+     Prestige uses a custom-element <sidebar-drawer> or
+     a <details> with data-disclosure attribute.
+     We try the most specific first, fall back broadly. */
+  var FF_MENU = [
+    /* Prestige Invisible Themes */
+    '[aria-controls="sidebar-menu"]',
+    'button[data-action="open-drawer"]',
+    '.header__icon--nav-toggle',
+    '.header__hamburger-icon',
+    /* Common Shopify patterns */
+    'header-drawer summary',
+    'details[id*="menu"] > summary',
+    'button[aria-label="Menu"]',
+    'button[aria-label="Open navigation menu"]',
+    '[data-menu-toggle]'
+  ];
+
+  var FF_SEARCH = [
+    /* Prestige */
+    '[aria-controls="search-popup"]',
+    'button[data-action="open-search"]',
+    '.header__icon--search',
+    '.header__search-button',
+    /* Common */
+    'button[aria-label="Search"]',
+    'button[aria-label="Open search"]',
+    'a[href="/search"].header__icon'
+  ];
+
+  var FF_CART = [
+    /* Prestige */
+    '[aria-controls="cart-drawer"]',
+    'button[data-action="open-cart"]',
+    '.header__icon--cart',
+    '.header__cart-button',
+    /* Common */
+    'button[aria-label="Cart"]',
+    'button[aria-label="Open cart"]',
+    'a[href="/cart"].header__icon'
+  ];
+
+  /* ── Utility: find and click first matching selector ── */
+  function ffNavClick(selectors, fallbackUrl) {
+    for (var i = 0; i < selectors.length; i++) {
+      var el = document.querySelector(selectors[i]);
+      if (el) {
+        el.click();
+        return true;
+      }
+    }
+    if (fallbackUrl) window.location.href = fallbackUrl;
+    return false;
+  }
+
+  /* ── Public: Menu ── */
+  window.ffNavMenu = function() {
+    var opened = ffNavClick(FF_MENU, null);
+    if (!opened) {
+      /* Try opening any closed <details> that is a nav */
+      var details = document.querySelector('details[class*="nav"], details[class*="menu"], details[data-disclosure]');
+      if (details) { details.open = true; }
+    }
+    ffNavSetActive('ff-tab--menu');
+  };
+
+  /* ── Public: Search ── */
+ window.ffNavSearch = function() {
+  window.location.href = '/search';
+};
+
+  /* ── Public: Cart ── */
+  window.ffNavCart = function() {
+    ffNavClick(FF_CART, '/cart');
+    ffNavSetActive('ff-tab--cart');
+  };
+
+  /* ── Set active tab ── */
+  function ffNavSetActive(tabClass) {
+    var tabs = document.querySelectorAll('#ff-mobile-nav .ff-tab');
+    for (var i = 0; i < tabs.length; i++) {
+      tabs[i].classList.remove('ff-tab--active');
+    }
+    var target = document.querySelector('#ff-mobile-nav .ff-tab.' + tabClass);
+    if (target) target.classList.add('ff-tab--active');
+  }
+
+  /* ── Highlight active tab from current URL ── */
+  function ffNavInitActive() {
+    var p = window.location.pathname;
+    if      (p.indexOf('/search')  !== -1)       ffNavSetActive('ff-tab--search');
+    else if (p.indexOf('/cart')    !== -1)        ffNavSetActive('ff-tab--cart');
+    else if (p.indexOf('sale')     !== -1 ||
+             p.indexOf('discount') !== -1)        ffNavSetActive('ff-tab--sale');
+    else if (window.location.hash === '#smile-home') ffNavSetActive('ff-tab--rewards');
+  }
+
+  /* ── Live cart count update via Shopify /cart.js ──
+     Updates the badge without a page reload.
+     Called after add-to-cart events. */
+  function ffNavUpdateCartCount() {
+    fetch('/cart.js')
+      .then(function(r) { return r.json(); })
+      .then(function(data) {
+        var badge = document.getElementById('ff-cart-count');
+        if (!badge) return;
+        var count = data.item_count || 0;
+        badge.textContent = count;
+        if (count > 0) {
+          badge.classList.remove('ff-cart-badge--empty');
+        } else {
+          badge.classList.add('ff-cart-badge--empty');
+        }
+      })
+      .catch(function() {});
+  }
+
+  /* ── Listen for Shopify cart update events ── */
+  document.addEventListener('cart:updated',   ffNavUpdateCartCount);
+  document.addEventListener('cart:add',        ffNavUpdateCartCount);
+  /* Prestige / custom events */
+  document.addEventListener('theme:cart:open', function() { ffNavSetActive('ff-tab--cart'); });
+
+  /* ── Rewards tab: set active on click ── */
+  document.addEventListener('DOMContentLoaded', function() {
+    var rewardsTab = document.querySelector('#ff-mobile-nav .ff-tab--rewards');
+    if (rewardsTab) {
+      rewardsTab.addEventListener('click', function() {
+        ffNavSetActive('ff-tab--rewards');
+      });
+    }
+    ffNavInitActive();
+    /* Initial cart count refresh */
+    ffNavUpdateCartCount();
+  });
+
+})();
+</script>
+
+{% schema %}
+{
+  "name": "FF Mobile Nav",
+  "tag": "div",
+  "class": "ff-mobile-nav-section",
+  "limit": 1,
+  "settings": [
+    {
+      "type": "header",
+      "content": "─── On / Off ───"
+    },
+    {
+      "type": "checkbox",
+      "id": "ff_enable",
+      "label": "Enable mobile bottom nav",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "─── Tab Order ───"
+    },
+    {
+      "type": "paragraph",
+      "content": "Reorder tabs by editing the comma list. Valid keys: menu, search, whatsapp, cart, sale, rewards"
+    },
+    {
+      "type": "text",
+      "id": "ff_tab_order",
+      "label": "Tab order",
+      "default": "menu,search,whatsapp,cart,sale,rewards"
+    },
+    {
+      "type": "header",
+      "content": "─── Show / Hide ───"
+    },
+    {
+      "type": "checkbox",
+      "id": "ff_show_menu",
+      "label": "Show Menu",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "ff_show_search",
+      "label": "Show Search",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "ff_show_whatsapp",
+      "label": "Show WhatsApp",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "ff_show_cart",
+      "label": "Show Cart",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "ff_show_sale",
+      "label": "Show Sale",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "ff_show_rewards",
+      "label": "Show Rewards",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "─── Labels ───"
+    },
+    {
+      "type": "text",
+      "id": "ff_lbl_menu",
+      "label": "Menu label",
+      "default": "Menu"
+    },
+    {
+      "type": "text",
+      "id": "ff_lbl_search",
+      "label": "Search label",
+      "default": "Search"
+    },
+    {
+      "type": "text",
+      "id": "ff_lbl_whatsapp",
+      "label": "WhatsApp label",
+      "default": "WhatsApp"
+    },
+    {
+      "type": "text",
+      "id": "ff_lbl_cart",
+      "label": "Cart label",
+      "default": "Cart"
+    },
+    {
+      "type": "text",
+      "id": "ff_lbl_sale",
+      "label": "Sale label",
+      "default": "Sale"
+    },
+    {
+      "type": "text",
+      "id": "ff_lbl_rewards",
+      "label": "Rewards label",
+      "default": "Rewards"
+    },
+    {
+      "type": "header",
+      "content": "─── WhatsApp ───"
+    },
+    {
+      "type": "text",
+      "id": "ff_wa_number",
+      "label": "Phone number (with country code)",
+      "default": "+919217040453"
+    },
+    {
+      "type": "text",
+      "id": "ff_wa_message",
+      "label": "Pre-filled message",
+      "default": "Hi, I'd love to know more about FéraFive."
+    },
+    {
+      "type": "header",
+      "content": "─── Links ───"
+    },
+    {
+      "type": "url",
+      "id": "ff_sale_url",
+      "label": "Sale page URL",
+      "info": "e.g. /collections/sale"
+    },
+    {
+      "type": "header",
+      "content": "─── Colours ───"
+    },
+    {
+      "type": "color",
+      "id": "ff_bg_color",
+      "label": "Bar background",
+      "default": "#FAF9F7",
+      "info": "Warm off-white matching FéraFive"
+    },
+    {
+      "type": "color",
+      "id": "ff_border_color",
+      "label": "Top divider",
+      "default": "#E8E4DF"
+    },
+    {
+      "type": "color",
+      "id": "ff_icon_color",
+      "label": "Icon & label",
+      "default": "#2C2A28"
+    },
+    {
+      "type": "color",
+      "id": "ff_icon_active_color",
+      "label": "Active / cart badge",
+      "default": "#1A1A1A"
+    }
+  ],
+  "presets": [
+    {
+      "name": "FF Mobile Nav",
+      "settings": {
+        "ff_enable": true,
+        "ff_tab_order": "menu,search,whatsapp,cart,sale,rewards"
+      }
+    }
+  ]
+}
+{% endschema %} 

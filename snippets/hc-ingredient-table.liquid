@@ -1,0 +1,167 @@
+{%- assign ingredients = product.metafields.custom.ingredients_table.value -%}
+
+{%- if ingredients != blank -%}
+  <style>
+    .hc-ing-wrap {
+      max-width: 560px;
+      margin: 0 auto;
+    }
+
+    .hc-ing-table__heading {
+      font-size: 13px;
+      font-weight: 600;
+      color: #999;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      text-align: center;
+      margin: 0 0 6px;
+    }
+
+    .hc-ing-table__title {
+      font-size: 22px;
+      font-weight: 700;
+      color: #000;
+      text-align: center;
+      margin: 0 0 24px;
+      line-height: 1.2;
+    }
+
+    .hc-ing-table {
+      width: 100%;
+      margin: 0 0 8px;
+    }
+
+    .hc-ing-table__head {
+      display: grid;
+      grid-template-columns: 28px 1fr 1fr;
+      gap: 8px;
+      padding: 10px 12px;
+      background: #f5f5f5;
+      border-radius: 8px;
+      margin-bottom: 4px;
+    }
+
+    .hc-ing-table__head span {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #000;
+    }
+
+    .hc-ing-table__row {
+      display: grid;
+      grid-template-columns: 28px 1fr 1fr;
+      gap: 8px;
+      padding: 10px 12px;
+      border-bottom: 1px solid #f0f0f0;
+      align-items: center;
+    }
+
+    .hc-ing-table__row:last-of-type {
+      border-bottom: none;
+    }
+
+    .hc-ing-table__row--hidden {
+      display: none;
+    }
+
+    .hc-ing-table__num {
+      font-size: 11px;
+      color: #bbb;
+      font-weight: 500;
+    }
+
+    .hc-ing-table__name {
+      font-size: 13px;
+      font-weight: 400;
+      color: #1a1a1a;
+    }
+
+    .hc-ing-table__name--bold {
+      font-weight: 700;
+      color: #000;
+    }
+
+    .hc-ing-table__benefit {
+      font-size: 12px;
+      color: #888;
+      font-weight: 400;
+      font-style: italic;
+    }
+
+    .hc-ing-table__toggle {
+      background: none;
+      border: 1px solid #e0e0e0;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      color: #000;
+      cursor: pointer;
+      padding: 7px 16px;
+      display: block;
+      margin: 12px auto 0;
+      transition: background 0.15s;
+    }
+
+    .hc-ing-table__toggle:hover {
+      background: #f5f5f5;
+    }
+
+    @media (max-width: 749px) {
+      .hc-ing-wrap {
+        max-width: 100%;
+      }
+
+      .hc-ing-table__head span,
+      .hc-ing-table__name {
+        font-size: 12px;
+      }
+
+      .hc-ing-table__benefit {
+        font-size: 11px;
+      }
+    }
+  </style>
+
+  <div class="hc-ing-wrap">
+    <p class="hc-ing-table__heading">Formula</p>
+    <h3 class="hc-ing-table__title">What's Inside</h3>
+
+    <div class="hc-ing-table">
+      <div class="hc-ing-table__head">
+        <span>#</span>
+        <span>Ingredient</span>
+        <span>Benefit</span>
+      </div>
+
+      {%- for item in ingredients -%}
+        <div class="hc-ing-table__row{% if forloop.index > 6 %} hc-ing-table__row--hidden{% endif %}" data-ing-row>
+          <span class="hc-ing-table__num">{{ forloop.index }}</span>
+          <span class="hc-ing-table__name{% if item.highlight %} hc-ing-table__name--bold{% endif %}">
+            {{ item.name }}
+          </span>
+          <span class="hc-ing-table__benefit">{{ item.benefit }}</span>
+        </div>
+      {%- endfor -%}
+    </div>
+
+    {%- if ingredients.size > 6 -%}
+      <button
+        class="hc-ing-table__toggle"
+        id="hc-ing-toggle"
+        onclick="
+          var rows = document.querySelectorAll('[data-ing-row]');
+          var btn = document.getElementById('hc-ing-toggle');
+          var isOpen = btn.getAttribute('data-open') === 'true';
+          rows.forEach(function(row, i) {
+            if (i >= 6) row.style.display = isOpen ? 'none' : 'grid';
+          });
+          btn.setAttribute('data-open', isOpen ? 'false' : 'true');
+          btn.textContent = isOpen ? 'See all ingredients +' : 'Show less −';
+        "
+      >See all ingredients +</button>
+    {%- endif -%}
+  </div>
+
+{%- endif -%}

@@ -1,0 +1,33 @@
+{%- for child in rich_text_data.children -%}
+  {%- if child.type == 'paragraph' -%}
+    <p>
+      {%- for text_node in child.children -%}
+        {{ text_node.value }}
+      {%- endfor -%}
+    </p>
+  {%- endif -%}
+  
+  {%- if child.type == 'list' -%}
+    {%- if child.listType == 'ordered' -%}
+      <ol>
+    {%- else -%}
+      <ul>
+    {%- endif -%}
+    
+    {%- for item in child.children -%}
+      {%- if item.type == 'list-item' -%}
+        <li>
+          {%- for text_node in item.children -%}
+            {{ text_node.value }}
+          {%- endfor -%}
+        </li>
+      {%- endif -%}
+    {%- endfor -%}
+    
+    {%- if child.listType == 'ordered' -%}
+      </ol>
+    {%- else -%}
+      </ul>
+    {%- endif -%}
+  {%- endif -%}
+{%- endfor -%}

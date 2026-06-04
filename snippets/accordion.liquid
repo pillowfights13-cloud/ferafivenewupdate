@@ -1,0 +1,63 @@
+<accordion-disclosure class="accordion {% if size %}accordion--{{ size }}{% endif %} {% if bleed %}bleed sm:unbleed{% endif %}" {{ block.shopify_attributes }}>
+  <details class="accordion__disclosure group" {% if open %}open aria-expanded="true"{% else %}aria-expanded="false"{% endif %} style="background:#f5f5f5;border-radius:10px;overflow:hidden;padding:0 14px;">
+    <summary>
+      <span class="accordion__toggle {% if show_title_as_text %}text-lg{% else %}h6{% endif %}" style="font-weight:700;">
+        {%- if custom_icon != blank or icon != 'none' -%}
+          <span class="text-with-icon gap-4" style="font-weight:600">
+            {%- if custom_icon != blank -%}
+              {{- custom_icon | image_url: width: custom_icon.width | image_tag: sizes: '16px', widths: '16,32,48', class: 'constrained-image', style: '--image-max-width: 16px' -}}
+            {%- else -%}
+              {%- render 'icon' with icon, width: 16 -%}
+            {%- endif -%}
+            {{- title -}}
+          </span>
+        {%- else -%}
+          <span>{{ title }}</span>
+        {%- endif -%}
+
+        {%- if show_arrow -%}
+          {%- render 'icon' with 'chevron-down', class: 'group-expanded:rotate' -%}
+        {%- else -%}
+          <span class="animated-plus group-expanded:rotate" aria-hidden="true"></span>
+        {%- endif -%}
+      </span>
+    </summary>
+
+    <div class="accordion__content {% if prose_content %}prose{% endif %}" style="padding-bottom:14px;">
+      {{- content -}}
+    </div>
+  </details>
+</accordion-disclosure>
+
+<style>
+  accordion-disclosure.accordion {
+    border: none !important;
+    border-top: none !important;
+    border-bottom: none !important;
+    box-shadow: none !important;
+  }
+
+  accordion-disclosure.accordion + accordion-disclosure.accordion {
+    border-top: none !important;
+    margin-top: 8px;
+  }
+
+  .accordion-group accordion-disclosure.accordion {
+    border: none !important;
+    border-top: none !important;
+  }
+
+  .accordion-group {
+    border: none !important;
+    border-top: none !important;
+    border-bottom: none !important;
+    gap: 8px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .animated-plus::before,
+  .animated-plus::after {
+    background: #000 !important;
+  }
+</style>
